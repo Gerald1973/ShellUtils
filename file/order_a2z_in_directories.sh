@@ -6,8 +6,8 @@ do
 done
 for letter in {a..z}
 do
-    find ./${letter^}* -type f -exec mv -v {} ${letter} \;
-    find ./${letter}* -type f -exec mv -v {} ${letter} \;
+    find ./${letter^}* -maxdepth 0 -type f -exec mv -v {} ${letter} \;
+    find ./${letter}*  -maxdepth 0 -type f -exec mv -v {} ${letter} \;
 done
 for number in {0..9}
 do
@@ -15,6 +15,7 @@ do
 done
 for number in {0..9}
 do
-     mv -vf ${number}*.* ${number}
+    find ./${number}* -type f -exec mv -v {} ${number} \;
 done
-
+mkdir '#'
+find ./*  -maxdepth 0 -type f -exec mv -v {} '#' \;
