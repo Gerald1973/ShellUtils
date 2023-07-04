@@ -15,7 +15,7 @@ do
 done
 for number in {0..9}
 do
-    find ./${number}* -type f -exec mv -v {} ${number} \;
+    find ./${number}* -maxdepth 0 -type f -exec mv -v {} ${number} \;
 done
 mkdir '#'
 find ./*  -maxdepth 0 -type f -exec mv -v {} '#' \;
