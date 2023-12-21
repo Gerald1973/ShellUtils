@@ -1,7 +1,7 @@
 #!/bin/bash
 input_dir="/mnt/data_02/tmp/video_in"
 output_dir="/mnt/data_02/tmp/video_out"
-video_in_suffix="mp4"
+video_in_suffix="mkv"
 video_out_suffix="mp4"
 current_dir=$(pwd)
 cd "${input_dir}"
