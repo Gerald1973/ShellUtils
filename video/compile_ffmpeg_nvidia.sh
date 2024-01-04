@@ -1,5 +1,33 @@
-#!/bin/bash -v
+#!/bin/bash
 NVIDIA_DIR="${HOME}/tmp/nvidia_ffmpeg"
+rm -rfv ${NVIDIA_DIR}
+echo "Install missing packages"
+echo "========================"
+sudo apt-get update -qq && sudo apt-get -y install \
+  autoconf \
+  automake \
+  build-essential \
+  cmake \
+  git-core \
+  libass-dev \
+  libfreetype6-dev \
+  libgnutls28-dev \
+  libmp3lame-dev \
+  libsdl2-dev \
+  libtool \
+  libva-dev \
+  libvdpau-dev \
+  libvorbis-dev \
+  libxcb1-dev \
+  libxcb-shm0-dev \
+  libxcb-xfixes0-dev \
+  meson \
+  ninja-build \
+  pkg-config \
+  texinfo \
+  wget \
+  yasm \
+  zlib1g-dev
 sudo apt install nvidia-cuda-toolkit
 sudo apt remove ffmpeg
 mkdir -p ${NVIDIA_DIR}
@@ -15,7 +43,17 @@ echo "=================="
 git clone https://git.ffmpeg.org/ffmpeg.git
 sudo apt install build-essential yasm cmake libtool libc6 libc6-dev unzip wget libnuma1 libnuma-dev
 cd ${NVIDIA_DIR}/ffmpeg
-./configure --enable-nonfree --enable-cuda-nvcc --enable-libnpp --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64
+./configure --enable-nonfree \
+  --enable-cuda-nvcc \
+  --enable-libnpp \
+  --enable-gpl \
+  --enable-gnutls \
+  --enable-libass \
+  --enable-libfreetype \
+  --enable-libmp3lame \
+  --enable-libvorbis \
+  --extra-cflags=-I/usr/local/cuda/include \
+  --extra-ldflags=-L/usr/local/cuda/lib64
 make -j $(nproc)
 ls -l ffmpeg
 ./ffmpeg
