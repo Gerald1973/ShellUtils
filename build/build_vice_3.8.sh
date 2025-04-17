@@ -28,15 +28,19 @@ sudo apt -y install libmpg123-dev      # required for MP3 decoding (and for
                                         # mp3@64 cartridge support)
 sudo apt -y install libvorbis-dev      # Ogg/Vorbis support
 sudo apt -y install libflac-dev        # FLAC support
+sudo apt -y install libgtk-3-dev
+sudo apt -y install libevdev-dev
 
 cd ${SRC_DIR}
-echo "Now Iam in the " $(pwd) "directory"
 make clean
+echo "Now Iam in the " $(pwd) "directory"
 ./autogen.sh
 ./configure --enable-arch=native \
     --with-resid \
-    --enable-sdl2ui \
+    --enable-gtk3ui \
     --enable-ethernet \
-    --with-pulse
+    --with-pulse \
+    --prefix=$HOME \
+    --enable-desktop-files 
 make -j2
-./src/x64sc
+make install
