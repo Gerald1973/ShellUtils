@@ -34,11 +34,12 @@ archive.
 EO_HERE_DOC
 
 #git clone https://<PAT>@github.com/username/repo.git
+#git clone https://username:password@github.com/username/repository.git
 if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"
 else
     echo "Repository mirroring ongoing..."
-    git clone --mirror ${1} ${2}
+    git clone --verbose --mirror ${1} ${2}
     echo "Compressing repository ongoing..."
     zip -r ${2}.zip ${2}
     echo "Removing directory"

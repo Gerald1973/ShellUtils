@@ -28,32 +28,41 @@ sudo apt-get update -qq && sudo apt-get -y install \
   wget \
   yasm \
   zlib1g-dev
-sudo apt install nvidia-cuda-toolkit
 sudo apt remove ffmpeg
 mkdir -p ${NVIDIA_DIR}
 cd ${NVIDIA_DIR}
 echo "NVidia codec coder compilation (nvcc)"
 echo "====================================="
-git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+git clone https://github.com/FFmpeg/nv-codec-headers.git
 cd nv-codec-headers
+make
 sudo make install
 cd ${NVIDIA_DIR}
 echo "ffmpeg compilation"
 echo "=================="
-git clone https://git.ffmpeg.org/ffmpeg.git
+git clone https://github.com/FFmpeg/FFmpeg.git
 sudo apt install build-essential yasm cmake libtool libc6 libc6-dev unzip wget libnuma1 libnuma-dev
-cd ${NVIDIA_DIR}/ffmpeg
+cd ${NVIDIA_DIR}/FFmpeg
+git checkout n7.1.1
 ./configure --enable-nonfree \
+  --enable-gpl \
+  --enable-nonfree \
   --enable-cuda-nvcc \
   --enable-libnpp \
-  --enable-gpl \
-  --enable-gnutls \
+  --enable-nvenc \
+  --enable-nvdec \
   --enable-libass \
   --enable-libfreetype \
   --enable-libmp3lame \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-libfdk-aac \
+  --enable-libopus \
   --enable-libvorbis \
-  --extra-cflags=-I/usr/local/cuda/include \
-  --extra-ldflags=-L/usr/local/cuda/lib64
+  --enable-libass \
+  --enable-libfreetype \
+  --extra-cflags=-I/usr/local/cuda-12.8/include \
+  --extra-ldflags=-L/usr/local/cuda-12.8/lib64
 make -j $(nproc)
 ls -l ffmpeg
 ./ffmpeg
