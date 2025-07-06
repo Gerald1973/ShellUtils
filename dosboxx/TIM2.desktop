@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=The Incredible Machine 2
+Comment=Lancer le jeu The Incredible Machine 2 avec DOSBox-X
+Exec=/home/louis/bin/TIM2.sh
+Type=Application
+Terminal=false
+Icon=TIM2
+Categories=Game;PuzzleGame;
+Keywords=game;puzzle;retro;dos
