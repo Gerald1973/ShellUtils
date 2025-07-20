@@ -26,13 +26,33 @@ if [ ! -d "$DIR_PATH" ]; then
 fi
 
 # Define the file extensions to include
-EXTENSIONS="xml html md markdown java c cpp py js"
+EXTENSIONS=""
+EXTENSIONS="${EXTENSIONS} adoc asm asp aspx atom"
+EXTENSIONS="${EXTENSIONS} awk bat bib c cfg"
+EXTENSIONS="${EXTENSIONS} clj cljs cmd coffee conf"
+EXTENSIONS="${EXTENSIONS} cpp cs css csv dart"
+EXTENSIONS="${EXTENSIONS} diff dockerfile edn el elm"
+EXTENSIONS="${EXTENSIONS} env erb erl ex exs"
+EXTENSIONS="${EXTENSIONS} fs go gql gradle groovy"
+EXTENSIONS="${EXTENSIONS} h haml hbs hcl hpp"
+EXTENSIONS="${EXTENSIONS} hrl hs htm html inc"
+EXTENSIONS="${EXTENSIONS} ini ipynb java js json"
+EXTENSIONS="${EXTENSIONS} jsp jsx kt kts less"
+EXTENSIONS="${EXTENSIONS} lhs lisp litcoffee log lua"
+EXTENSIONS="${EXTENSIONS} m makefile markdown md ml"
+EXTENSIONS="${EXTENSIONS} org patch php pl pm"
+EXTENSIONS="${EXTENSIONS} po properties proto ps1 pug"
+EXTENSIONS="${EXTENSIONS} py r R rb rmd"
+EXTENSIONS="${EXTENSIONS} rs rst sass scala scss"
+EXTENSIONS="${EXTENSIONS} sh sql svelte swift tex"
+EXTENSIONS="${EXTENSIONS} toml ts tsv tsx txt"
+EXTENSIONS="${EXTENSIONS} vb vue xml yaml yml"
 
 # Create or overwrite the output file
 > "$OUTPUT_FILE"
 
 # Write a header for the output file
-echo "===== Concatenated Files for Complexity.ai Spaces =====
+echo "===== Concatenated Files for ai Spaces =====
 Generated on: $(date)
 Source Directory: $DIR_PATH
 ==============================================
