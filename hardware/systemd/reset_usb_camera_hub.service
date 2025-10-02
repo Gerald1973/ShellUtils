@@ -4,7 +4,9 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/reset_usb_hub.sh
+ExecStart=/usr/local/bin/reset_usb_camera_hub.sh
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/bin/systemctl --user restart pipewire pipewire-pulse wireplumber
 
 [Install]
 WantedBy=multi-user.target
