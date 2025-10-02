@@ -1,0 +1,10 @@
+[Unit]
+Description=Reset dynamique du hub USB 1a40:0101 au boot
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/reset_usb_hub.sh
+
+[Install]
+WantedBy=multi-user.target
