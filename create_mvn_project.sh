@@ -2,7 +2,7 @@
 
 # Variables pour le projet
 GROUP_ID="com.smilesmile1973"
-ARTIFACT_ID="grokjavaconcatenator"
+ARTIFACT_ID="AuthenticatorOauth2"
 VERSION="1.0-SNAPSHOT"
 JAVA_VERSION="17"
 PACKAGE_PATH=$(echo $GROUP_ID | tr '.' '/')
