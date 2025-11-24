@@ -1,17 +1,24 @@
 #!/bin/bash
 
+# Check for root privileges (Required for exhaustive BIOS info)
+if [ "$EUID" -ne 0 ]; then
+  echo "Attention : Veuillez lancer ce script avec sudo pour voir les infos complètes du BIOS."
+  echo "Usage : sudo $0"
+  echo ""
+  # We continue anyway, but some commands might fail or show less info
+fi
+
 # Clear the screen for better readability
 clear
 
 echo "================================================================="
-echo "                System Information"
+echo "                System Information (Exhaustive)"
 echo "================================================================="
 
 # Operating System Information
 echo ""
 echo "--- Operating System ---"
 if [ -f /etc/os-release ]; then
-    # Use the os-release file to get the distribution name
     . /etc/os-release
     echo "OS: $PRETTY_NAME"
 fi
@@ -20,44 +27,72 @@ echo "Architecture: $(uname -m)"
 echo "Hostname: $(hostname)"
 echo ""
 
+# BIOS & Motherboard Information (EXHAUSTIVE)
+echo "--- BIOS & Firmware (DMI Type 0) ---"
+if command -v dmidecode &> /dev/null; then
+    # Type 0 contains BIOS information (Vendor, Version, Release Date, ROM Size, Characteristics)
+    dmidecode -t 0 | grep -v "SMBIOS" | grep -v "Handle" | grep -v "DMI type"
+else
+    echo "Outil 'dmidecode' introuvable ou accès refusé."
+fi
+echo ""
+
+echo "--- System Information (DMI Type 1) ---"
+if command -v dmidecode &> /dev/null; then
+    # Type 1 contains System UUID, Serial Number, Manufacturer
+    dmidecode -t 1 | grep -v "SMBIOS" | grep -v "Handle" | grep -v "DMI type"
+else
+    echo "Données non disponibles."
+fi
+echo ""
+
+echo "--- Baseboard Information (DMI Type 2) ---"
+if command -v dmidecode &> /dev/null; then
+    # Type 2 contains Motherboard specific info
+    dmidecode -t 2 | grep -v "SMBIOS" | grep -v "Handle" | grep -v "DMI type"
+else
+    echo "Données non disponibles."
+fi
+echo ""
+
 # CPU Information
 echo "--- CPU ---"
-# Display CPU model, core count, and architecture
 echo "Model: $(lscpu | grep "Model name" | cut -d ':' -f 2 | sed 's/^[ \t]*//')"
 echo "Cores: $(nproc)"
 echo "Architecture: $(lscpu | grep "Architecture" | cut -d ':' -f 2 | sed 's/^[ \t]*//')"
+# Adding generic CPU flags/features which are often relevant to BIOS settings (Virtualization etc)
+echo "Virtualization (VT-x/AMD-V): $(lscpu | grep "Virtualization" | cut -d ':' -f 2 | sed 's/^[ \t]*//')"
 echo ""
 
 # Graphics Card (GPU) Information
 echo "--- Graphics Card ---"
-# Use lspci to find VGA compatible controllers (graphics cards)
 lspci | grep -E "VGA|3D"
 echo ""
 
 # Memory Information
 echo "--- Memory ---"
-# Display RAM and swap usage in a human-readable format
 free -h
+echo "--- Memory Hardware Details (DMI Type 17 - Short) ---"
+if command -v dmidecode &> /dev/null; then
+    # Shows speed and type of installed sticks (often controlled by BIOS XMP)
+    dmidecode -t 17 | grep -E "Size:|Type:|Speed:|Manufacturer:|Part Number:" | grep -v "No Module Installed"
+fi
 echo ""
 
 # Disk Usage Information
 echo "--- Disk Usage ---"
-# Display disk space usage for all mounted filesystems
 df -h
 echo ""
 
 # Block Device Information
 echo "--- Block Devices ---"
-# List block devices (disks and partitions), their sizes, and mount points
 lsblk
 echo ""
 
 # Network Information
 echo "--- Network ---"
-# Display the machine's IP addresses
 echo "IP Address(es): $(hostname -I)"
 echo "Network Interface Configuration:"
-# Display a summary of network interfaces
 ip -br addr
 echo ""
 
