@@ -121,6 +121,10 @@ echo "--- boot log ---"
 journalctl -b
 echo ""
 
+echo "--- config.txt (Only for Raspberry) ---"
+cat /boot/firmware/config.txt
+echo ""
+
 echo "================================================================="
 echo "                  Scan Complete"
 echo "================================================================="
