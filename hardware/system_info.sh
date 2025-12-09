@@ -96,6 +96,31 @@ echo "Network Interface Configuration:"
 ip -br addr
 echo ""
 
+# Service information
+echo "--- Service list ---"
+systemctl list-units --type=service
+echo ""
+
+# fstab
+echo "--- fstab ---"
+cat /etc/fstab
+echo ""
+
+# startup files
+echo "--- systemd startup files ---"
+ls -lR /etc/systemd/system/
+echo ""
+
+#Startup files order
+echo "--- sysyemd files order ---"
+systemd-analyze critical-chain
+echo ""
+
+#Startup log
+echo "--- boot log ---"
+journalctl -b
+echo ""
+
 echo "================================================================="
 echo "                  Scan Complete"
 echo "================================================================="
