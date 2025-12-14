@@ -15,7 +15,7 @@ if [ ! -d "$GAME_DIR" ]; then
 fi
 
 # Check if Might & Magic III executable exists
-if [ ! -f "$GAME_DIR/GAMES/MM3/MM3.EXE" ]; then
+if [ ! -f "${GAME_DIR}/GAMES/MM3/MM3.EXE" ]; then
     echo "Error: Might & Magic III not found in $GAME_DIR."
     exit 1
 fi

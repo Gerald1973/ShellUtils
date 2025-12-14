@@ -1,9 +1,8 @@
 [Desktop Entry]
-Version=1.0
-Type=Application
 Name=Might and Magic III
 Comment=Launch Might and Magic III using DOSBox-X
-Exec=/home/papa/games/dosboxx/MM3.sh
-Icon=MM3
+Exec=/bin/bash -c "${HOME}/games/dosboxx/MM3.sh"
+Type=Application
 Terminal=false
+Icon=MM3
 Categories=Game;RolePlaying;
