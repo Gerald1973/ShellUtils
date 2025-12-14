@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=DOOM
+Comment=Launch Doom using DOSBox-X
+Exec=/bin/bash -c "${HOME}/games/dosboxx/DOOM.sh"
+Type=Application
+Terminal=false
+Icon=DOOM
+Categories=Game
