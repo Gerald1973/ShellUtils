@@ -65,8 +65,52 @@ echo "Virtualization (VT-x/AMD-V): $(lscpu | grep "Virtualization" | cut -d ':' 
 echo ""
 
 # Graphics Card (GPU) Information
-echo "--- Graphics Card ---"
-lspci | grep -E "VGA|3D"
+echo "--- Graphics Card & Drivers ---"
+# Hardware listing with kernel driver info
+lspci -nnk | grep -i -A3 -E "VGA|3D|Display"
+echo ""
+
+echo "--- NVIDIA Driver & CUDA ---"
+if command -v nvidia-smi &> /dev/null; then
+    echo "NVIDIA-SMI Status:"
+    nvidia-smi
+else
+    echo "nvidia-smi not found (No NVIDIA driver active)."
+fi
+echo ""
+
+if command -v nvcc &> /dev/null; then
+    echo "CUDA Compiler (nvcc):"
+    nvcc --version
+else
+    echo "nvcc not found (CUDA Toolkit not in PATH)."
+fi
+
+if [ -f /proc/driver/nvidia/version ]; then
+    echo "Kernel Module Version:"
+    cat /proc/driver/nvidia/version
+fi
+echo ""
+
+# Display Server Information
+echo "--- Display Server ---"
+if [ -n "$XDG_SESSION_TYPE" ]; then
+    echo "Session Type: $XDG_SESSION_TYPE"
+else
+    # Try to detect via loginctl for the sudo user
+    TARGET_USER="${SUDO_USER:-$USER}"
+    if command -v loginctl &> /dev/null; then
+        SESSION_ID=$(loginctl list-sessions | grep "$TARGET_USER" | awk '{print $1}' | head -n 1)
+        if [ -n "$SESSION_ID" ]; then
+            SESSION_TYPE=$(loginctl show-session "$SESSION_ID" -p Type)
+            echo "Session Type (loginctl): ${SESSION_TYPE#Type=}"
+        else
+            echo "No active session found for user $TARGET_USER"
+        fi
+    else
+        echo "Could not detect session type."
+    fi
+fi
 echo ""
 
 # Memory Information
@@ -96,14 +140,45 @@ echo "Network Interface Configuration:"
 ip -br addr
 echo ""
 
+# Kernel Parameters
+echo "--- Kernel Parameters (sysctl) ---"
+if command -v sysctl &> /dev/null; then
+    sysctl -a 2>/dev/null
+else
+    echo "sysctl command not found."
+fi
+echo ""
+
 # Service information
 echo "--- Service list ---"
 systemctl list-units --type=service
 echo ""
 
+# Library Information
+echo "--- Libraries (Versions) ---"
+if command -v dpkg &> /dev/null; then
+    dpkg -l | grep "^ii  lib" | awk '{print $2, $3}'
+elif command -v rpm &> /dev/null; then
+    rpm -qa | grep "^lib"
+elif command -v pacman &> /dev/null; then
+    pacman -Q | grep "^lib"
+else
+    echo "Package manager not found. Cannot list libraries."
+fi
+echo ""
+
 # fstab
 echo "--- fstab ---"
 cat /etc/fstab
+echo ""
+
+# GRUB Configuration
+echo "--- GRUB Configuration (/etc/default/grub) ---"
+if [ -f /etc/default/grub ]; then
+    cat /etc/default/grub
+else
+    echo "/etc/default/grub not found."
+fi
 echo ""
 
 # startup files
