@@ -242,7 +242,7 @@ echo ""
 
 #Startup log
 echo "--- boot log ---"
-journalctl -b
+journalctl -b -p warning
 echo ""
 
 echo "--- config.txt (Only for Raspberry) ---"
