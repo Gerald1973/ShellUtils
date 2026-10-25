@@ -240,10 +240,10 @@ echo "--- systemd files order ---"
 systemd-analyze critical-chain
 echo ""
 
-#Startup log
-echo "--- boot log ---"
-journalctl -b -p warning
-echo ""
+# #Startup log
+# echo "--- boot log ---"
+# journalctl -b -p warning
+# echo ""
 
 echo "--- config.txt (Only for Raspberry) ---"
 cat /boot/firmware/config.txt
