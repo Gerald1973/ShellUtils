@@ -1,0 +1,167 @@
+
+============================================================
+ DIAGNOSTIC PERFORMANCES - ryzen5
+============================================================
+
+=== OS / KERNEL ===
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+VERSION="13 (trixie)"
+Linux ryzen5 6.12.107+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.107-1 (2026-08-29) x86_64 GNU/Linux
+
+=== CPUFREQ ===
+Driver     : amd-pstate-epp
+Governor   : performance
+Power profile:
+performance
+
+analyzing CPU 2:
+  driver: amd-pstate-epp
+  CPUs which run at the same hardware frequency: 2
+  CPUs which need to have their frequency coordinated by software: 2
+  maximum transition latency:  Cannot determine or is not supported.
+  hardware limits: 550 MHz - 4.88 GHz
+  available cpufreq governors: performance powersave
+  current policy: frequency should be within 1.76 GHz and 4.88 GHz.
+                  The governor "performance" may decide which speed to use
+                  within this range.
+  current CPU frequency: Unable to call hardware
+  current CPU frequency: 3.70 GHz (asserted by call to kernel)
+  boost state support:
+    Supported: yes
+    Active: yes
+    AMD PSTATE Highest Performance: 181. Maximum Frequency: 4.88 GHz.
+    AMD PSTATE Nominal Performance: 126. Nominal Frequency: 3.70 GHz.
+    AMD PSTATE Lowest Non-linear Performance: 60. Lowest Non-linear Frequency: 1.76 GHz.
+    AMD PSTATE Lowest Performance: 19. Lowest Frequency: 550 MHz.
+
+=== CPU ===
+Architecture:                            x86_64
+CPU(s):                                  12
+On-line CPU(s) list:                     0-11
+Model name:                              AMD Ryzen 5 5600X 6-Core Processor
+Thread(s) per core:                      2
+Core(s) per socket:                      6
+CPU(s) scaling MHz:                      70%
+CPU max MHz:                             4875,0000
+CPU min MHz:                             550,0000
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-11
+
+=== RAM ===
+dmidecode : non installé
+
+=== RAM UTILISATION ===
+               total        used        free      shared  buff/cache   available
+Mem:            94Gi       5,7Gi        76Gi       187Mi        13Gi        88Gi
+Swap:          102Gi          0B       102Gi
+
+=== NVME / STOCKAGE ===
+NAME    MODEL                 SIZE ROTA SCHED
+sda     MassStorageClass        0B    0 mq-deadline
+sdb     MassStorageClass        0B    0 mq-deadline
+sdc     MassStorageClass        0B    0 mq-deadline
+sdd     MassStorageClass        0B    0 mq-deadline
+nvme1n1 CT2000P3SSD8          1,8T    0 none
+nvme0n1 Samsung SSD 980 1TB 931,5G    0 none
+
+--- Scheduler NVMe ---
+[/sys/block/nvme0n1]
+[none] mq-deadline 
+[/sys/block/nvme1n1]
+[none] mq-deadline 
+
+=== RESEAU ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp5s0           DOWN           
+wlp4s0           UP             192.168.0.36/24 fe80::9c82:15cd:47d6:fa14/64 
+br-befe3b275da4  DOWN           172.19.0.1/16 
+br-0012c7f93763  DOWN           172.18.0.1/16 
+br-0ccb62db5a15  DOWN           172.20.0.1/16 
+docker0          DOWN           172.17.0.1/16 
+
+--- NetworkManager ---
+DEVICE           TYPE      STATE                   CONNECTION      
+wlp4s0           wifi      connected               spectrum7 1     
+lo               loopback  connected (externally)  lo              
+br-0012c7f93763  bridge    connected (externally)  br-0012c7f93763 
+br-0ccb62db5a15  bridge    connected (externally)  br-0ccb62db5a15 
+br-befe3b275da4  bridge    connected (externally)  br-befe3b275da4 
+docker0          bridge    connected (externally)  docker0         
+p2p-dev-wlp4s0   wifi-p2p  disconnected            --              
+enp5s0           ethernet  unavailable             --              
+
+--- Ethernet enp5s0 ---
+ethtool : non installé
+
+=== NFS ===
+TARGET       SOURCE                    FSTYPE OPTIONS
+/mnt/data_01 192.168.0.42:/mnt/data_01 nfs4   rw,noatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,acregmin=1800,acregmax=1800,acdirmin=1800,acdirmax=1800,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=192.168.0.36,local_lock=none,addr=192.168.0.42
+/mnt/data_02 192.168.0.42:/mnt/data_02 nfs4   rw,noatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,acregmin=1800,acregmax=1800,acdirmin=1800,acdirmax=1800,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=192.168.0.36,local_lock=none,addr=192.168.0.42
+
+=== SWAP ===
+/home/gmarechal/git/ShellUtils/hardware/diagnostic-performance.sh: line 102: swapon: command not found
+
+               total        used        free      shared  buff/cache   available
+Mem:            94Gi       5,7Gi        76Gi       187Mi        13Gi        88Gi
+Swap:          102Gi          0B       102Gi
+
+=== VM / MEMOIRE ===
+/home/gmarechal/git/ShellUtils/hardware/diagnostic-performance.sh: line 109: sysctl: command not found
+
+=== CPU GOVERNOR SERVICE ===
+# /etc/systemd/system/set-cpu-governor.service
+[Unit]
+Description=Set CPU governor to performance
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'for i in {0..11}; do echo performance > /sys/devices/system/cpu/cpu$i/cpufreq/scaling_governor; done'
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+
+=== SERVICES PERFORMANCE ===
+set-cpu-governor                    : ACTIVE
+preload                             : ACTIVE
+power-profiles-daemon               : ACTIVE
+NetworkManager-wait-online          : ACTIVE
+docker                              : ACTIVE
+containerd                          : ACTIVE
+
+=== KERNEL CMDLINE ===
+BOOT_IMAGE=/boot/vmlinuz-6.12.107+deb13-amd64 root=UUID=81d7fc60-b6b2-44cb-a946-cc29b7f0adee ro nvidia-drm.modeset=1 amd_pstate=active amd_pstate.shared_mem=1 iommu=pt pcie_aspm=off
+
+=== AMD PSTATE ===
+amd_pstate présent
+status : active
+prefcore : enabled
+
+=== GPU NVIDIA ===
+name, driver_version, pstate, temperature.gpu, power.draw [W], utilization.gpu [%], memory.used [MiB], memory.total [MiB]
+NVIDIA GeForce RTX 3060, 595.80, P8, 58, 19.22 W, 10 %, 925 MiB, 12288 MiB
+
+=== PCIe ASPM ===
+
+=== DISQUES / ESPACE ===
+Filesystem                              Type        Size  Used Avail Use% Mounted on
+udev                                    devtmpfs     47G     0   47G   0% /dev
+tmpfs                                   tmpfs       9,5G   19M  9,5G   1% /run
+/dev/nvme0n1p2                          ext4        815G  507G  268G  66% /
+tmpfs                                   tmpfs        48G   12K   48G   1% /dev/shm
+efivarfs                                efivarfs    128K   11K  113K   9% /sys/firmware/efi/efivars
+tmpfs                                   tmpfs       5,0M   12K  5,0M   1% /run/lock
+tmpfs                                   tmpfs       1,0M     0  1,0M   0% /run/credentials/systemd-journald.service
+tmpfs                                   tmpfs       1,0M     0  1,0M   0% /run/credentials/systemd-resolved.service
+tmpfs                                   tmpfs        48G   60M   48G   1% /tmp
+/dev/nvme0n1p1                          vfat        511M   40M  472M   8% /boot/efi
+tmpfs                                   tmpfs       9,5G  164K  9,5G   1% /run/user/1000
+gmarechal@marechal.tech:/home/gmarechal fuse.sshfs  915G  271G  598G  32% /home/gmarechal/mnt/marechal.tech
+192.168.0.42:/mnt/data_02               nfs4        1,8T  1,6T  171G  91% /mnt/data_02
+192.168.0.42:/mnt/data_01               nfs4        1,8T  1,5T  232G  87% /mnt/data_01
+
+============================================================
+ FIN DU DIAGNOSTIC
+============================================================
+

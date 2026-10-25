@@ -15,6 +15,15 @@ echo "================================================================="
 echo "                System Information (Exhaustive)"
 echo "================================================================="
 
+# Execution privileges
+if [ "$EUID" -eq 0 ] && [ -n "${SUDO_USER}" ]; then
+    echo "Run with sudo: yes (invoked by ${SUDO_USER})"
+elif [ "$EUID" -eq 0 ]; then
+    echo "Run with sudo: no (logged in directly as root)"
+else
+    echo "Run with sudo: no (user ${USER}, some information will be missing)"
+fi
+
 # Operating System Information
 echo ""
 echo "--- Operating System ---"
@@ -140,6 +149,46 @@ echo "Network Interface Configuration:"
 ip -br addr
 echo ""
 
+# Open Ports
+echo "--- Listening Ports (TCP/UDP) ---"
+if command -v ss &> /dev/null; then
+    if [ "$EUID" -ne 0 ]; then
+        echo "(Run with sudo to see the process owning each port)"
+    fi
+    ss -tulpn
+else
+    echo "ss not found."
+fi
+echo ""
+
+# Firewall
+echo "--- Firewall ---"
+if command -v ufw &> /dev/null; then
+    echo "# ufw"
+    ufw status verbose 2>&1
+    echo ""
+fi
+if command -v nft &> /dev/null; then
+    echo "# nftables"
+    nft list ruleset 2>&1
+    echo ""
+fi
+if command -v iptables &> /dev/null; then
+    echo "# iptables"
+    iptables -S 2>&1
+    echo ""
+fi
+if command -v firewall-cmd &> /dev/null; then
+    echo "# firewalld"
+    firewall-cmd --list-all 2>&1
+    echo ""
+fi
+if ! command -v ufw &> /dev/null && ! command -v nft &> /dev/null \
+    && ! command -v iptables &> /dev/null && ! command -v firewall-cmd &> /dev/null; then
+    echo "No firewall tool found (ufw, nft, iptables, firewall-cmd)."
+fi
+echo ""
+
 # Kernel Parameters
 echo "--- Kernel Parameters (sysctl) ---"
 if command -v sysctl &> /dev/null; then
@@ -187,7 +236,7 @@ ls -lR /etc/systemd/system/
 echo ""
 
 #Startup files order
-echo "--- sysyemd files order ---"
+echo "--- systemd files order ---"
 systemd-analyze critical-chain
 echo ""
 
@@ -198,6 +247,102 @@ echo ""
 
 echo "--- config.txt (Only for Raspberry) ---"
 cat /boot/firmware/config.txt
+echo ""
+
+# Cron
+echo "--- Cron: /etc/crontab ---"
+if [ -f /etc/crontab ]; then
+    cat /etc/crontab
+else
+    echo "/etc/crontab not found."
+fi
+echo ""
+
+echo "--- Cron: /etc/cron.d ---"
+if [ -d /etc/cron.d ]; then
+    for f in /etc/cron.d/*; do
+        [ -f "${f}" ] || continue
+        echo "# ${f}"
+        cat "${f}"
+        echo ""
+    done
+else
+    echo "/etc/cron.d not found."
+fi
+
+echo "--- Cron: periodic directories ---"
+for d in /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly; do
+    if [ -d "${d}" ]; then
+        echo "# ${d}"
+        ls -l "${d}"
+    fi
+done
+echo ""
+
+echo "--- Cron: user crontabs ---"
+if [ "$EUID" -eq 0 ]; then
+    for u in $(cut -d ':' -f 1 /etc/passwd); do
+        entries=$(crontab -l -u "${u}" 2>/dev/null)
+        if [ -n "${entries}" ]; then
+            echo "# crontab of ${u}"
+            echo "${entries}"
+            echo ""
+        fi
+    done
+else
+    echo "# crontab of ${USER} (run with sudo to see all users)"
+    crontab -l 2>/dev/null || echo "No crontab for ${USER}."
+fi
+echo ""
+
+echo "--- systemd timers ---"
+systemctl list-timers --all
+echo ""
+
+# VPN Configuration (secrets are masked)
+echo "--- VPN: WireGuard ---"
+if command -v wg &> /dev/null; then
+    echo "wg show:"
+    wg show 2>/dev/null || echo "No active WireGuard interface (or root privileges required)."
+else
+    echo "wg not found (wireguard-tools not installed)."
+fi
+if [ -d /etc/wireguard ]; then
+    for f in /etc/wireguard/*.conf; do
+        [ -f "${f}" ] || continue
+        echo "# ${f}"
+        sed -E 's/^([[:space:]]*(PrivateKey|PresharedKey)[[:space:]]*=).*/\1 <hidden>/I' "${f}"
+        echo ""
+    done
+else
+    echo "/etc/wireguard not found or not readable."
+fi
+echo ""
+
+echo "--- VPN: OpenVPN ---"
+if [ -d /etc/openvpn ]; then
+    for f in $(find /etc/openvpn -type f \( -name "*.conf" -o -name "*.ovpn" \) 2>/dev/null); do
+        echo "# ${f}"
+        # Hide inline private keys and static keys
+        sed -E '/^<(key|tls-auth|tls-crypt|secret)>/,/^<\/(key|tls-auth|tls-crypt|secret)>/c\<hidden>' "${f}"
+        echo ""
+    done
+else
+    echo "/etc/openvpn not found."
+fi
+echo ""
+
+echo "--- VPN: NetworkManager connections ---"
+if command -v nmcli &> /dev/null; then
+    nmcli -t -f NAME,TYPE,DEVICE connection show | grep -iE "vpn|wireguard"
+    echo ""
+else
+    echo "nmcli not found."
+fi
+
+echo "--- VPN: network interfaces (tun/tap/wg) ---"
+ip -br link show type wireguard 2>/dev/null
+ip -br addr | grep -E "^(tun|tap|wg)"
 echo ""
 
 echo "================================================================="
